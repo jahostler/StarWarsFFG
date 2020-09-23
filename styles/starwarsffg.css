@@ -19,7 +19,8 @@
 }
 
 /* Global styles */
-div, section {
+div,
+section {
   scrollbar-width: thin;
 }
 
@@ -28,7 +29,7 @@ div, section {
 }
 
 .window-app .window-content {
-  background: rgba(255, 255, 255, 0.7);
+  background: #cccccc;
   font-size: 9pt;
 }
 
@@ -43,11 +44,11 @@ div, section {
 }
 
 #chat-log .message {
-  background: rgba(255, 255, 255, 0.9);
+  background: #eeeeee;
 }
 
 #chat-form textarea {
-  background: rgba(255, 255, 255, 0.9);
+  background: whitesmoke;
 }
 
 span.dietype {
