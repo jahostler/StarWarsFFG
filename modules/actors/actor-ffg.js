@@ -61,7 +61,7 @@ export class ActorFFG extends Actor {
         return { type: item, label: game.i18n.localize(`SWFFG.Skills${item}`) === `SWFFG.Skills${item}` ? item : game.i18n.localize(`SWFFG.Skills${item}`) };
       });
     }
-
+    this._prepareSharedData.bind(this);
     this._prepareSharedData(actorData);
     if (actorData.type === "minion") this._prepareMinionData(actorData);
     if (actorData.type === "character") this._prepareCharacterData(actorData);
@@ -96,6 +96,7 @@ export class ActorFFG extends Actor {
     }
 
     if (actorData.type === "minion" || actorData.type === "character") {
+      this._applyModifiers.bind(this);
       this._applyModifiers(actorData);
       if (game.settings.get("starwarsffg", "enableSoakCalc")) {
         this._calculateDerivedValues(actorData);
@@ -362,6 +363,7 @@ export class ActorFFG extends Actor {
    * @param  {string} modifierType
    */
   _setModifiers(actorData, properties, name, modifierType) {
+    const actor = this;
     const data = actorData.data;
     const attributes = Object.keys(data.attributes)
       .filter((key) =>
@@ -398,8 +400,16 @@ export class ActorFFG extends Actor {
           value = data[name][k].rank;
         } else if (key === "Shields") {
           value = [data[name][k].fore, data[name][k].port, data[name][k].starboard, data[name][k].aft];
+        } else if (key === "Soak") {
+          try {
+            if ((actor?._sheetClass?.name === "AdversarySheetFFG" && actorData.data.flags?.config?.enableAutoSoakCalculation) || game.settings.get("starwarsffg", "enableSoakCalc")) {
+              value = 0;
+            }
+          } catch (err) {
+            // swallow this exception as it only occurs during initialization of system.
+          }
         } else {
-          if (data[name][k]?.max) {
+          if (data[name][k]?.max && name !== "characteristics") {
             value = data[name][k].max;
           } else {
             value = data[name][k].value;
@@ -457,6 +467,8 @@ export class ActorFFG extends Actor {
       actorData.modifiers = {};
     }
 
+    this._setModifiers.bind(this);
+
     /* Characteristics */
     this._setModifiers(actorData, CONFIG.FFG.characteristics, "characteristics", "Characteristic");
     Object.keys(CONFIG.FFG.characteristics).forEach((key) => {
@@ -478,12 +490,12 @@ export class ActorFFG extends Actor {
       }
       if (key === "Wounds") {
         if (data.attributes.Wounds.value === 0) {
-          total = data.attributes.Brawn.value + ModifierHelpers.getBaseValue(actorData.items, "Brawn", "Characteristic");
+          total = data.attributes.Brawn.value; // + ModifierHelpers.getBaseValue(actorData.items, "Brawn", "Characteristic");
         }
       }
       if (key === "Strain") {
         if (data.attributes.Strain.value === 0) {
-          total = data.attributes.Willpower.value + ModifierHelpers.getBaseValue(actorData.items, "Willpower", "Characteristic");
+          total = data.attributes.Willpower.value; // + ModifierHelpers.getBaseValue(actorData.items, "Willpower", "Characteristic");
         }
       }
       if (key === "Encumbrance") {
@@ -519,7 +531,15 @@ export class ActorFFG extends Actor {
       data.skills[key].boost = ModifierHelpers.getCalculatedValueFromItems(actorData.items, key, "Skill Boost");
       const setback = ModifierHelpers.getCalculatedValueFromItems(actorData.items, key, "Skill Setback");
       const remsetback = ModifierHelpers.getCalculatedValueFromItems(actorData.items, key, "Skill Remove Setback");
-      data.skills[key].force = ModifierHelpers.getCalculatedValueFromItems(actorData.items, key, "Force Boost") > 0 ? data.stats.forcePool.max : 0;
+
+      const forceboost = ModifierHelpers.getCalculatedValueFromItems(actorData.items, key, "Force Boost");
+      data.skills[key].force = 0;
+      if (forceboost > 0) {
+        const forcedice = data.stats.forcePool.max - data.stats.forcePool.value;
+        if (forcedice > 0) {
+          data.skills[key].force = forcedice;
+        }
+      }
 
       if (remsetback >= setback) {
         data.skills[key].setback = 0;

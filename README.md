@@ -25,6 +25,17 @@ See our current production goals and progress [here](https://github.com/StarWars
 
 # Changelog
 
+- 06/10/2020 - Cstadther - Updated force dice for dice pool by subtracting max and committed.
+- 05/10/2020 - Cstadther - Found by Alerion, fix for firingarcs
+- 05/10/2020 - Cstadther - Updated groupmanager to correctly display theme based light/dark destiny image.
+- 05/10/2020 - Cstadther - Fixed issue where modifier display for weapons was swapped for setback and remove setback
+- 04/10/2020 - Cstadther - Fixed issue with minion sheet erroring.
+- 03/10/2020 - Cstadther - Fixed issue with migrating soak from 0.5 to 1.0 schema, fixed issue with soak calculation if auto calculation is turned off then on, removed adding willpower or brawn modifiers to Wound and Strain calculations.
+- 02/10/2020 - Cstadther - Fix File Uploads, 0.7.3 now requires mime type defined for overwriting files.
+- 02/10/2020 - Cstadther - Fix import of skill themes.
+- 30/09/2020 - Cstadther - Fix for issue #363, where removing a specialization talent modifier did not actually remove the modifier, any subsequent modifier updates were additive.
+- 30/09/2020 - Cstadther - Fixed issue with Minion group skills.
+- 30/09/2020 - Cstadther - Fixed issues with 0.7.3 and importer functionality, media type is now required in order to overwrite files.
 - 30/09/2020 - Esrin - Fixed missing tab overflows for sheets.
 - 30/09/2020 - Esrin - Updated Spanish language file provided by ForjaSalvaje.
 - 30/09/2020 - Esrin - Merged in the DsN support and added the required SASS to coincide with their alpha release.
